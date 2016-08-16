@@ -1,8 +1,9 @@
 var gulpUtil = require( 'gulp-util' );
 var through2 = require( 'through2' );
 
-module.exports = function ()
+module.exports = function (options)
 {
+	options.root = options.root || 'html';
 	return through2.obj(
 		function ( data, encoding, callback )
 		{
@@ -27,9 +28,8 @@ module.exports = function ()
 				if ( isDomEntry( data ) )
 				{
 					data.contents = new Buffer(
-						getParentSelector( data ) + '\n{\n'
-						+ String( data.contents )
-						+ '\n}\n'
+						getParentSelector( data ) +
+						'\n{\n' + String( data.contents ) + '\n}\n'
 					);
 				}
 				
@@ -40,7 +40,7 @@ module.exports = function ()
 	
 	function isDomEntry( data )
 	{
-		return /^(?:\d+_)?html/.test(
+		return (new RegExp('^(?:\d+_)?' + options.root)).test(
 			data.path.substr( data.base.length ).split( '/' )[0]
 		);
 	}
